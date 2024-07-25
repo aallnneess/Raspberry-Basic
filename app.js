@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path'); // Modul zum Arbeiten mit Dateipfaden
-const indexRouter = require('./routes/index'); // Importieren des Routings für die Indexseite
+const statusRouter = require('./routes/status'); // Importieren des Routings für die Indexseite
 
 // Initialisieren der Express-App
 const app = express();
@@ -9,7 +9,7 @@ app.use(express.json()); // Middleware zum Parsen von JSON-Daten
 app.use(express.urlencoded({ extended: false })); // Middleware zum Parsen von URL-kodierten Daten
 app.use(express.static(path.join(__dirname, 'public'))); // Bereitstellen statischer Dateien aus dem Verzeichnis 'public'
 
-app.use('/status', indexRouter); // Verwenden des indexRouters für Anfragen an die Haupt-URL
+app.use('/status', statusRouter); // Verwenden des indexRouters für Anfragen an die Haupt-URL
 
 // Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
 app.use((req, res, next) => {
