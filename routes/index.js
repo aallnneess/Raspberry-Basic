@@ -22,6 +22,32 @@ router.get('/status', async (req, res) => {
     const currentLoad = await si.currentLoad();
     const cpuUsage = currentLoad.currentLoad;
 
+
+    await si.fsSize()
+        .then(data => {
+            data.forEach(fs => {
+                console.log(`Filesystem: ${fs.fs}`);
+                console.log(`Type: ${fs.type}`);
+                console.log(`Size: ${(fs.size / 1073741824).toFixed(2)} GB`);
+                console.log(`Used: ${(fs.used / 1073741824).toFixed(2)} GB`);
+                console.log(`Available: ${(fs.available / 1073741824).toFixed(2)} GB`);
+                console.log(`Use: ${fs.use.toFixed(2)}%`);
+                console.log(`Mount: ${fs.mount}`);
+                console.log(`Read/Write: ${fs.rw}`);
+                console.log('---');
+            });
+        })
+        .catch(error => console.error(error));
+
+
+
+
+
+
+
+
+
+
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
         let signalStrength = 'N/A';
