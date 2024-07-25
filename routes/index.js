@@ -23,6 +23,8 @@ router.get('/status', async (req, res) => {
     const cpuUsage = currentLoad.currentLoad;
     const disSize = await si.fsSize();
 
+    console.log('diskSize', disSize);
+
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
         let signalStrength = 'N/A';
