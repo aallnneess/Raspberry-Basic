@@ -18,6 +18,9 @@ router.get('/status', (req, res) => {
     const cpus = os.cpus().length;
     const platform = os.platform();
 
+    // CPU-Auslastung und freier Speicherplatz
+    const cpuUsage = loadavg[0];  // 1-Minuten Load Average
+
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
         let signalStrength = 'N/A';
@@ -42,6 +45,7 @@ router.get('/status', (req, res) => {
                 totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
                 cpus: cpus,
                 platform: platform,
+                cpuUsage: cpuUsage,
                 signal: signalStrength,
                 voltage: voltage
             });
