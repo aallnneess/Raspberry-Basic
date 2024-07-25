@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 
 const os = require('os');
 
@@ -8,9 +9,7 @@ router.get('/', (req,res) => {
 });
 
 router.get('/status', (req, res) => {
-    res.send({
-        freemem: os.freemem() / 1024 / 1024
-    });
+    res.sendFile(path.join(__dirname, 'public', 'status.html'));
 });
 
 module.exports = router;
