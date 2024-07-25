@@ -38,7 +38,7 @@
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
                 document.getElementById('cpuUsage').textContent = data.cpuUsage;
-                document.getElementById('diskSize').textContent = data.disSize[1].available;
+                document.getElementById('diskSize').textContent = (data.disSize[1].available / 1024 / 1024) + ' mb';
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>
