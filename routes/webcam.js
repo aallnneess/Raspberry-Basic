@@ -12,6 +12,9 @@ const imagePath = path.join(__dirname, '..', 'public', 'images', 'capture.jpg');
 router.get('/capture', (req, res) => {
     // Shell command to capture an image using rpicam-still
     exec(`rpicam-still -o ${imagePath}`, (error, stdout, stderr) => {
+
+        console.log('path: ', imagePath);
+
         if (error) {
             console.error(`Error capturing the image: ${error.message}`);
             return res.status(500).send('Error capturing the image');
@@ -20,8 +23,6 @@ router.get('/capture', (req, res) => {
             console.error(`stderr: ${stderr}`);
             return res.status(500).send('Error capturing the image');
         }
-
-        console.error('path: ', imagePath);
 
         // Check if the file exists
         res.sendFile(imagePath, (err) => {
