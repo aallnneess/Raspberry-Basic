@@ -10,18 +10,18 @@ router.get('/', (req, res) => {
 const imagePath = path.join(__dirname, '..', 'public', 'images', 'capture.jpg');
 
 router.get('/capture', (req, res) => {
-    // Shell-Kommando zum Aufnehmen eines Bildes
-    exec(`raspistill -o ${imagePath}`, (error, stdout, stderr) => {
+    // Shell command to capture an image using rpicam-still
+    exec(`rpicam-still -o ${imagePath}`, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Fehler beim Aufnehmen des Bildes: ${error.message}`);
-            return res.status(500).send('Fehler beim Aufnehmen des Bildes');
+            console.error(`Error capturing the image: ${error.message}`);
+            return res.status(500).send('Error capturing the image');
         }
         if (stderr) {
             console.error(`stderr: ${stderr}`);
-            return res.status(500).send('Fehler beim Aufnehmen des Bildes');
+            return res.status(500).send('Error capturing the image');
         }
 
-        // Senden des aufgenommenen Bildes als Antwort
+        // Send the captured image as a response
         res.sendFile(imagePath);
     });
 });
