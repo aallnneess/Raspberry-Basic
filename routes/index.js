@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const { exec } = require('child_process');
 
 const os = require('os');
 
@@ -9,21 +10,49 @@ router.get('/', (req,res) => {
 });
 
 router.get('/status', (req, res) => {
-    const uptime = os.uptime(); // System Uptime in seconds
-    const loadavg = os.loadavg(); // Load average for 1, 5, and 15 minutes
-    const freemem = os.freemem(); // Free memory in bytes
-    const totalmem = os.totalmem(); // Total memory in bytes
-    const cpus = os.cpus().length; // Number of CPU cores
-    const platform = os.platform(); // OS platform
+    // Grundlegende Systeminformationen
+    const uptime = os.uptime();
+    const loadavg = os.loadavg();
+    const freemem = os.freemem();
+    const totalmem = os.totalmem();
+    const cpus = os.cpus().length;
+    const platform = os.platform();
 
-    res.json({
-        uptime: `${Math.floor(uptime / 60)} minutes`,
-        loadavg: loadavg,
-        freemem: `${Math.floor(freemem / 1024 / 1024)} MB`,
-        totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
-        cpus: cpus,
-        platform: platform
+    // WLAN Signalstärke
+    exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
+        let signalStrength = 'N/A';
+        if (!error && stdout) {
+            const match = stdout.match(/Link Quality=(\d+\/\d+)/);
+            if (match) {
+                signalStrength = match[1];
+            }
+        }
+
+        // Spannung
+        exec("vcgencmd measure_volts", (error, stdout, stderr) => {
+            let voltage = 'N/A';
+            if (!error && stdout) {
+                voltage = stdout.trim().split('=')[1];
+            }
+
+            res.json({
+                uptime: `${Math.floor(uptime / 60)} minutes`,
+                loadavg: loadavg,
+                freemem: `${Math.floor(freemem / 1024 / 1024)} MB`,
+                totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
+                cpus: cpus,
+                platform: platform,
+                signal: signalStrength,
+                voltage: voltage
+            });
+        });
     });
 });
 
 module.exports = router;
+
+
+
+
+
+
