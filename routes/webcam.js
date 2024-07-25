@@ -55,10 +55,10 @@ router.get('/capture', (req, res) => {
             console.error(`Fehler beim Aufnehmen des Bildes: ${error.message}`);
             return res.status(500).send(`Fehler beim Aufnehmen des Bildes: ${error.message}`);
         }
-        // if (stderr) {
-        //     console.error(`stderr: ${stderr}`);
-        //     return res.status(500).send(`Fehler beim Aufnehmen des Bildes: ${stderr}`);
-        // }
+
+        if (stderr) {
+            console.warn(`Warnung: ${stderr}`);  // Protokollieren, aber nicht die Anfrage stoppen
+        }
 
         console.log(`Bild erfolgreich aufgenommen: ${stdout}`);
 
