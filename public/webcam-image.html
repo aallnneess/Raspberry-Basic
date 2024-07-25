@@ -19,6 +19,9 @@
         fetch('/webcam/capture')
             .then(response => response.blob())
             .then(blob => {
+                console.log('blob:');
+                console.log(blob);
+                console.log();
                 const img = document.getElementById('webcamImage');
                 img.src = URL.createObjectURL(blob);
                 img.style.display = 'block';
