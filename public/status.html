@@ -18,7 +18,6 @@
     <p>CPU ~Usage: <span id="cpuUsage"></span>%</p>
     <p>WLAN Signal Strength: <span id="signal"></span></p>
     <p>Voltage: <span id="voltage"></span></p>
-    <p>Disk Size: <span id="diskSize"></span></p>
 
     <br>
 
@@ -38,7 +37,6 @@
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
                 document.getElementById('cpuUsage').textContent = data.cpuUsage;
-                document.getElementById('diskSize').textContent = (data.disSize[1].available / Math.pow(2, 30)) + ' mb';
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>

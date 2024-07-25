@@ -21,9 +21,6 @@ router.get('/status', async (req, res) => {
     // CPU-Auslastung in Prozent
     const currentLoad = await si.currentLoad();
     const cpuUsage = currentLoad.currentLoad;
-    const disSize = await si.fsSize();
-
-    console.log('diskSize', disSize);
 
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
@@ -51,7 +48,6 @@ router.get('/status', async (req, res) => {
                 signal: signalStrength,
                 voltage: voltage,
                 cpuUsage: `${cpuUsage.toFixed(2)}%`,
-                disSize: disSize
             });
         });
     });
