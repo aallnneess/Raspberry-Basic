@@ -13,6 +13,7 @@
     <p>Uptime: <span id="uptime"></span></p>
     <p>Load Average: <span id="loadavg"></span></p>
     <p>Free Memory: <span id="freemem"></span></p>
+    <p>Available Memory: <span id="availablemem"></span></p>
     <p>Total Memory: <span id="totalmem"></span></p>
     <p>Platform: <span id="platform"></span></p>
     <p>CPU Count: <span id="cpus"></span></p>
@@ -33,6 +34,7 @@
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
                 document.getElementById('cpuUsage').textContent = data.cpuUsage;
+                document.getElementById('availablemem').textContent = data.availablemem;
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>
