@@ -9,7 +9,21 @@ router.get('/', (req,res) => {
 });
 
 router.get('/status', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'status.html'));
+    const uptime = os.uptime(); // System Uptime in seconds
+    const loadavg = os.loadavg(); // Load average for 1, 5, and 15 minutes
+    const freemem = os.freemem(); // Free memory in bytes
+    const totalmem = os.totalmem(); // Total memory in bytes
+    const cpus = os.cpus().length; // Number of CPU cores
+    const platform = os.platform(); // OS platform
+
+    res.json({
+        uptime: `${Math.floor(uptime / 60)} minutes`,
+        loadavg: loadavg,
+        freemem: `${Math.floor(freemem / 1024 / 1024)} MB`,
+        totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
+        cpus: cpus,
+        platform: platform
+    });
 });
 
 module.exports = router;

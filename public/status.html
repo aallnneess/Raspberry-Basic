@@ -9,5 +9,16 @@
 </head>
 <body>
     <h1>Status</h1>
+    <br>
+    <p>Uptime: <span id="uptime"></span></p>
+
+    <script>
+        fetch('status')
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById('uptime').textContent = data.uptime;
+            })
+            .catch(error => console.log('Error fetching status:', error));
+    </script>
 </body>
 </html>
