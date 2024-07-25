@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 // Allgemeine Fehlerbehandlung
-app.use((err, req, res, next) => {
+app.use((error, req, res, next) => {
     res.status(error.status || 500); // Setzen des Statuscodes auf den Fehlerstatus oder 500 (Interner Serverfehler)
     res.json({
         error: {
