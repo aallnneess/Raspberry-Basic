@@ -25,7 +25,8 @@
                 const img = document.getElementById('webcamImage');
                 img.src = URL.createObjectURL(blob);
                 img.style.display = 'block';
-                img.style.width = '75vw';
+                img.style.maxHeight = '75vh';
+                img.style.maxWidth = '75vw';
             })
             .catch(err => console.error(err));
     });
