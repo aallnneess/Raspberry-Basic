@@ -21,7 +21,7 @@ router.get('/capture', (req, res) => {
             return res.status(500).send('Error capturing the image');
         }
 
-        console.log('path: ', imagePath);
+        console.error('path: ', imagePath);
 
         // Check if the file exists
         res.sendFile(imagePath, (err) => {
