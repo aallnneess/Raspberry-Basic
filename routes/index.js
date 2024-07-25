@@ -18,9 +18,6 @@ router.get('/status', (req, res) => {
     const cpus = os.cpus().length;
     const platform = os.platform();
 
-    // CPU-Auslastung und freier Speicherplatz
-    const cpuUsage = getCpuUsage();
-
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
         let signalStrength = 'N/A';
@@ -45,33 +42,12 @@ router.get('/status', (req, res) => {
                 totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
                 cpus: cpus,
                 platform: platform,
-                cpuUsage: cpuUsage,
                 signal: signalStrength,
                 voltage: voltage
             });
         });
     });
 });
-
-function getCpuUsage() {
-    const cpus = os.cpus();
-    let user = 0, nice = 0, sys = 0, idle = 0, irq = 0, total = 0;
-
-    for (let cpu in cpus) {
-        user += cpus[cpu].times.user;
-        nice += cpus[cpu].times.nice;
-        sys += cpus[cpu].times.sys;
-        idle += cpus[cpu].times.idle;
-        irq += cpus[cpu].times.irq;
-    }
-
-    total = user + nice + sys + idle + irq;
-
-    return {
-        idle: idle / cpus.length,
-        total: total / cpus.length
-    };
-}
 
 module.exports = router;
 
