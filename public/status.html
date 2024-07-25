@@ -16,6 +16,7 @@
     <p>Total Memory: <span id="totalmem"></span></p>
     <p>Platform: <span id="platform"></span></p>
     <p>CPU Count: <span id="cpus"></span></p>
+    <p>CPU Usage: <span id="cpuUsage"></span>%</p>
     <p>WLAN Signal Strength: <span id="signal"></span></p>
     <p>Voltage: <span id="voltage"></span></p>
 
@@ -31,6 +32,7 @@
                 document.getElementById('cpus').textContent = data.cpus;
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
+                document.getElementById('cpuUsage').textContent = data.cpuUsage;
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>

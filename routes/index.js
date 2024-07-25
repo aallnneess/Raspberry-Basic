@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const { exec } = require('child_process');
+const si = require('systeminformation');
 
 const os = require('os');
 
@@ -9,7 +10,7 @@ router.get('/', (req,res) => {
    res.send('Hello World!');
 });
 
-router.get('/status', (req, res) => {
+router.get('/status', async (req, res) => {
     // Grundlegende Systeminformationen
     const uptime = os.uptime();
     const loadavg = os.loadavg();
@@ -17,6 +18,10 @@ router.get('/status', (req, res) => {
     const totalmem = os.totalmem();
     const cpus = os.cpus().length;
     const platform = os.platform();
+
+    // CPU-Auslastung in Prozent
+    const currentLoad = await si.currentLoad();
+    const cpuUsage = currentLoad.currentload;
 
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
@@ -43,7 +48,8 @@ router.get('/status', (req, res) => {
                 cpus: cpus,
                 platform: platform,
                 signal: signalStrength,
-                voltage: voltage
+                voltage: voltage,
+                cpuUsage: `${cpuUsage.toFixed(2)}%`,
             });
         });
     });
