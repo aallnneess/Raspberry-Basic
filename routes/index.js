@@ -13,7 +13,6 @@ router.get('/', (req,res) => {
 router.get('/status', async (req, res) => {
     // Grundlegende Systeminformationen
     const uptime = os.uptime();
-    const loadavg = os.loadavg();
     const freemem = os.freemem();
     const totalmem = os.totalmem();
     const cpus = os.cpus().length;
@@ -42,7 +41,6 @@ router.get('/status', async (req, res) => {
 
             res.json({
                 uptime: `${Math.floor(uptime / 60)} minutes`,
-                loadavg: loadavg,
                 freemem: `${Math.floor(freemem / 1024 / 1024)} MB`,
                 totalmem: `${Math.floor(totalmem / 1024 / 1024)} MB`,
                 cpus: cpus,
