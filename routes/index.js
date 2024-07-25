@@ -22,31 +22,9 @@ router.get('/status', async (req, res) => {
     const currentLoad = await si.currentLoad();
     const cpuUsage = currentLoad.currentLoad;
 
-
-    await si.fsSize()
-        .then(data => {
-            data.forEach(fs => {
-                console.log(`Filesystem: ${fs.fs}`);
-                console.log(`Type: ${fs.type}`);
-                console.log(`Size: ${(fs.size / 1073741824).toFixed(2)} GB`);
-                console.log(`Used: ${(fs.used / 1073741824).toFixed(2)} GB`);
-                console.log(`Available: ${(fs.available / 1073741824).toFixed(2)} GB`);
-                console.log(`Use: ${fs.use.toFixed(2)}%`);
-                console.log(`Mount: ${fs.mount}`);
-                console.log(`Read/Write: ${fs.rw}`);
-                console.log('---');
-            });
-        })
-        .catch(error => console.error(error));
-
-
-
-
-
-
-
-
-
+    const fileS = await si.fsSize();
+    const filesSize = (fileS[0].size / 1073741824).toFixed(2);
+    const filesAvailable = (fileS[0].available / 1073741824).toFixed(2);
 
     // WLAN Signalstärke
     exec("iwconfig wlan0 | grep 'Link Quality'", (error, stdout, stderr) => {
@@ -74,6 +52,9 @@ router.get('/status', async (req, res) => {
                 signal: signalStrength,
                 voltage: voltage,
                 cpuUsage: `${cpuUsage.toFixed(2)}%`,
+                filesSize: filesSize,
+                filesAvailable: filesAvailable
+
             });
         });
     });

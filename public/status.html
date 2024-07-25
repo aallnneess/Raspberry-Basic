@@ -19,6 +19,9 @@
     <p>WLAN Signal Strength: <span id="signal"></span></p>
     <p>Voltage: <span id="voltage"></span></p>
 
+    <p>Disk Space: <span id="space"></span></p>
+    <p>Free Disk Space: <span id="freeSpace"></span></p>
+
     <br>
 
     <a href="/index.html">
@@ -37,6 +40,8 @@
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
                 document.getElementById('cpuUsage').textContent = data.cpuUsage;
+                document.getElementById('space').textContent = data.filesSize;
+                document.getElementById('freeSpace').textContent = data.filesAvailable;
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>
