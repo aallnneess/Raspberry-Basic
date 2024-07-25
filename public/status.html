@@ -40,8 +40,8 @@
                 document.getElementById('signal').textContent = data.signal;
                 document.getElementById('voltage').textContent = data.voltage;
                 document.getElementById('cpuUsage').textContent = data.cpuUsage;
-                document.getElementById('space').textContent = data.filesSize;
-                document.getElementById('freeSpace').textContent = data.filesAvailable;
+                document.getElementById('space').textContent = data.filesSize + ' GB';
+                document.getElementById('freeSpace').textContent = data.filesAvailable + ' GB';
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>
