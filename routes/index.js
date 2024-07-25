@@ -6,11 +6,7 @@ const si = require('systeminformation');
 
 const os = require('os');
 
-router.get('/', (req,res) => {
-   res.send('Hello World!');
-});
-
-router.get('/status', async (req, res) => {
+router.get('/', async (req, res) => {
     // Grundlegende Systeminformationen
     const uptime = os.uptime();
     const freemem = os.freemem();

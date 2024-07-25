@@ -9,7 +9,7 @@ app.use(express.json()); // Middleware zum Parsen von JSON-Daten
 app.use(express.urlencoded({ extended: false })); // Middleware zum Parsen von URL-kodierten Daten
 app.use(express.static(path.join(__dirname, 'public'))); // Bereitstellen statischer Dateien aus dem Verzeichnis 'public'
 
-app.use('/', indexRouter); // Verwenden des indexRouters für Anfragen an die Haupt-URL
+app.use('/status', indexRouter); // Verwenden des indexRouters für Anfragen an die Haupt-URL
 
 // Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
 app.use((req, res, next) => {
