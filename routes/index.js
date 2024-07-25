@@ -9,7 +9,7 @@ router.get('/', (req,res) => {
 });
 
 router.get('/status', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'status.html'));
+    res.sendFile(path.join(__dirname, '../public', 'status.html'));
 });
 
 module.exports = router;
