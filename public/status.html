@@ -11,12 +11,22 @@
     <h1>Status</h1>
     <br>
     <p>Uptime: <span id="uptime"></span></p>
+    <p>Load Average: <span id="loadavg"></span></p>
+    <p>Free Memory: <span id="freemem"></span></p>
+    <p>Total Memory: <span id="totalmem"></span></p>
+    <p>Platform: <span id="platform"></span></p>
+    <p>CPU Count: <span id="cpus"></span></p>
 
     <script>
         fetch('status')
             .then(response => response.json())
             .then(data => {
-              document.getElementById('uptime').textContent = data.uptime;
+                document.getElementById('uptime').textContent = data.uptime;
+                document.getElementById('loadavg').textContent = data.loadavg.join(', ');
+                document.getElementById('freemem').textContent = data.freemem;
+                document.getElementById('totalmem').textContent = data.totalmem;
+                document.getElementById('platform').textContent = data.platform;
+                document.getElementById('cpus').textContent = data.cpus;
             })
             .catch(error => console.log('Error fetching status:', error));
     </script>
