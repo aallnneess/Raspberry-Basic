@@ -29,7 +29,7 @@ router.get('/status', (req, res) => {
         }
 
         // Spannung
-        exec("vcgencmd measure_volts", (error, stdout, stderr) => {
+        exec("vcgencmd measure_volts core", (error, stdout, stderr) => {
             let voltage = 'N/A';
             if (!error && stdout) {
                 voltage = stdout.trim().split('=')[1];
