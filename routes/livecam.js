@@ -19,7 +19,10 @@ router.get('/stream', (req, res) => {
     console.log('Starting rpicam-vid...');
     const rpicam = spawn('rpicam-vid', ['-t', '0', '-o', '-', '--inline']);
 
-    rpicam.stdout.pipe(res);
+    rpicam.stdout.on('data', (data) => {
+        console.log('Streaming data...');
+        res.write(data);
+    });
 
     rpicam.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
@@ -27,6 +30,7 @@ router.get('/stream', (req, res) => {
 
     rpicam.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
+        res.end();
     });
 
     req.on('close', () => {
