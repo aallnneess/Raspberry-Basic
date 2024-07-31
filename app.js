@@ -42,7 +42,7 @@ const path = require('path');
 const statusRouter = require('./routes/status');
 const webcamRouter = require('./routes/webcam');
 const WebSocket = require('ws');
-const ffmpeg = require('fluent-ffmpeg');
+const { exec } = require('child_process');
 
 const app = express();
 
@@ -80,38 +80,21 @@ wss.on('connection', ws => {
     console.log('Client connected');
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const ffmpegCommand = ffmpeg(rtspUrl)
-        .inputOptions(['-rtsp_transport tcp'])
-        .outputFormat('mp4')
-        .videoCodec('libx264')
-        .audioCodec('aac')
-        .outputOptions([
-            '-preset ultrafast',
-            '-tune zerolatency',
-            '-f mp4',
-            '-movflags frag_keyframe+empty_moov'
-        ])
-        .on('start', (commandLine) => {
-            console.log('Spawned Ffmpeg with command: ' + commandLine);
-        })
-        .on('error', (err) => {
-            console.error('FFmpeg error:', err.message);
-            ws.close();
-        })
-        .on('end', () => {
-            console.log('FFmpeg stream ended');
-        });
+    const gstCommand = `gst-launch-1.0 rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multipartmux boundary=spion ! tcpclientsink host=127.0.0.1 port=3001`;
 
-    const ffstream = ffmpegCommand.pipe();
-
-    ffstream.on('data', chunk => {
-        console.log('Sende Chunk:', chunk.length);
-        ws.send(chunk);
+    const gstProcess = exec(gstCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`GStreamer error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`GStreamer stderr: ${stderr}`);
+        }
+        console.log(`GStreamer stdout: ${stdout}`);
     });
 
     ws.on('close', () => {
         console.log('Client disconnected');
-        ffmpegCommand.kill('SIGKILL');
+        gstProcess.kill('SIGKILL');
     });
 });
-
