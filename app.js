@@ -79,7 +79,7 @@ wss.on('connection', ws => {
     console.log('Client connected');
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const gstCommand = `rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay config-interval=1 pt=96 ! fdsink fd=1`;
+    const gstCommand = `rtspsrc location=${rtspUrl} ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! jpegenc ! rtpjpegpay ! fdsink fd=1`;
 
     const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'pipe'] });
 
