@@ -50,7 +50,6 @@
 
 
 
-
 const express = require('express');
 const path = require('path');
 const statusRouter = require('./routes/status');
@@ -68,14 +67,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/status', statusRouter);
 app.use('/webcam', webcamRouter);
 
-// Error handling for not found routes
+// Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
 app.use((req, res, next) => {
     const error = new Error('Not Found');
     error.status = 404;
     next(error);
 });
 
-// General error handling
+// Allgemeine Fehlerbehandlung
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
@@ -91,47 +90,45 @@ const wss = new WebSocket.Server({ server, path: '/stream' });
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
-    const rpicam = spawn('rpicam-vid', ['-t', '0', '--inline', '-o', '-']);
+    const ffmpeg = spawn('ffmpeg', [
+        '-f', 'v4l2',
+        '-input_format', 'mjpeg',
+        '-i', '/dev/video0',
+        '-c:v', 'libx264',
+        '-f', 'mpegts',
+        '-preset', 'ultrafast',
+        '-tune', 'zerolatency',
+        '-'
+    ]);
 
-    rpicam.stdout.on('data', (data) => {
+    ffmpeg.stdout.on('data', (data) => {
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(data);
         }
     });
 
-    rpicam.stderr.on('data', (data) => {
+    ffmpeg.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
     });
 
-    rpicam.on('close', (code) => {
-        console.log(`rpicam-vid process exited with code ${code}`);
+    ffmpeg.on('close', (code) => {
+        console.log(`ffmpeg process exited with code ${code}`);
     });
 
     ws.on('close', () => {
-        rpicam.kill();
+        ffmpeg.kill();
         console.log('Client disconnected');
     });
 
     ws.on('error', (error) => {
         console.error('WebSocket error:', error);
-        rpicam.kill();
+        ffmpeg.kill();
     });
 });
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
-
-
-
-
-
-
-
 
 
 

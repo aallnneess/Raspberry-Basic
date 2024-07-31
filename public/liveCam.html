@@ -12,50 +12,22 @@
     const video = document.getElementById('video');
     const ws = new WebSocket('ws://' + window.location.host + '/stream');
 
-    let mediaSource = new MediaSource();
-    let sourceBuffer;
-    let queue = [];
+    ws.binaryType = 'arraybuffer';
 
-    mediaSource.addEventListener('sourceopen', () => {
-        sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.640028"');
+    ws.onmessage = (event) => {
+        const blob = new Blob([event.data], { type: 'video/mp2t' });
+        const url = URL.createObjectURL(blob);
+        video.src = url;
+        video.play();
+    };
 
-        sourceBuffer.addEventListener('updateend', () => {
-            if (queue.length > 0 && !sourceBuffer.updating) {
-                sourceBuffer.appendBuffer(queue.shift());
-            }
-        });
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
 
-        ws.onmessage = (event) => {
-            if (event.data instanceof Blob) {
-                event.data.arrayBuffer().then(buffer => {
-                    if (!sourceBuffer.updating && queue.length === 0) {
-                        sourceBuffer.appendBuffer(buffer);
-                    } else {
-                        queue.push(buffer);
-                    }
-                }).catch(error => console.error('Buffer append error:', error));
-            }
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket connection closed');
-            mediaSource.endOfStream();
-        };
-    });
-
-    mediaSource.addEventListener('error', (event) => {
-        console.error('MediaSource error:', event);
-    });
-
-    mediaSource.addEventListener('sourceended', () => {
-        console.log('MediaSource ended');
-    });
-
-    video.src = URL.createObjectURL(mediaSource);
+    ws.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
 </script>
 </body>
 </html>
