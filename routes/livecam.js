@@ -10,7 +10,6 @@
 
 const express = require('express');
 const router = express.Router();
-const { spawn } = require('child_process');
 
 // Route für die Live-Stream-Seite
 router.get('/', (req, res) => {
@@ -23,10 +22,16 @@ router.get('/', (req, res) => {
                 var video = document.getElementById('video');
                 var socket = new WebSocket('ws://' + window.location.hostname + ':3000/stream');
                 socket.binaryType = 'arraybuffer';
-                socket.onmessage = function(event) {
-                    var blob = new Blob([event.data], { type: 'video/mp4' });
-                    video.src = URL.createObjectURL(blob);
-                };
+
+                let mediaSource = new MediaSource();
+                video.src = URL.createObjectURL(mediaSource);
+
+                mediaSource.addEventListener('sourceopen', function() {
+                    let sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+                    socket.onmessage = function(event) {
+                        sourceBuffer.appendBuffer(new Uint8Array(event.data));
+                    };
+                });
             </script>
         </body>
         </html>
@@ -34,3 +39,4 @@ router.get('/', (req, res) => {
 });
 
 module.exports = router;
+
