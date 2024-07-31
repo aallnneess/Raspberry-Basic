@@ -82,14 +82,23 @@ wss.on('connection', ws => {
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
     const ffmpegCommand = ffmpeg(rtspUrl)
         .outputFormat('mp4')
+        .videoCodec('libx264')
+        .audioCodec('aac')
+        .on('start', (commandLine) => {
+            console.log('Spawned Ffmpeg with command: ' + commandLine);
+        })
         .on('error', (err) => {
-            console.error('FFmpeg error:', err);
+            console.error('FFmpeg error:', err.message);
             ws.close();
+        })
+        .on('end', () => {
+            console.log('FFmpeg stream ended');
         });
 
     const ffstream = ffmpegCommand.pipe();
 
     ffstream.on('data', chunk => {
+        console.log('Sende Chunk:', chunk.length);
         ws.send(chunk);
     });
 
@@ -98,4 +107,5 @@ wss.on('connection', ws => {
         ffmpegCommand.kill('SIGKILL');
     });
 });
+
 
