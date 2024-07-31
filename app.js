@@ -81,7 +81,7 @@ wss.on('connection', ws => {
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
     const ffmpegCommand = ffmpeg(rtspUrl)
-        .outputFormat('flv')
+        .outputFormat('mp4')
         .on('error', (err) => {
             console.error('FFmpeg error:', err);
             ws.close();
