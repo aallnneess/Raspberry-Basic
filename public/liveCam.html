@@ -2,11 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LiveCam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi Camera Stream</title>
 </head>
 <body>
-<h1>LiveCam</h1>
-<!--    <video src="/liveCam/stream" controls autoplay></video>-->
-    <video src="../liveCam/stream" controls autoplay></video>
+<h1>Raspberry Pi Camera Stream</h1>
+<video id="video" controls autoplay></video>
+<script>
+    const video = document.getElementById('video');
+    const ws = new WebSocket('ws://' + window.location.host + '/stream');
+
+    let mediaSource = new MediaSource();
+    let sourceBuffer;
+
+    mediaSource.addEventListener('sourceopen', () => {
+        sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.640028"');
+
+        ws.onmessage = (event) => {
+            if (event.data instanceof Blob) {
+                event.data.arrayBuffer().then(buffer => {
+                    sourceBuffer.appendBuffer(buffer);
+                }).catch(error => console.error('Buffer append error:', error));
+            }
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+    });
+
+    video.src = URL.createObjectURL(mediaSource);
+</script>
 </body>
 </html>

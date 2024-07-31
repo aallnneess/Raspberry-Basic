@@ -51,8 +51,6 @@
 
 
 
-
-
 const express = require('express');
 const path = require('path');
 const statusRouter = require('./routes/status');
@@ -72,14 +70,14 @@ app.use('/status', statusRouter);
 app.use('/webcam', webcamRouter);
 app.use('/liveCam', liveCamRouter);
 
-// Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
+// Error handling for not found routes
 app.use((req, res, next) => {
     const error = new Error('Not Found');
     error.status = 404;
     next(error);
 });
 
-// Allgemeine Fehlerbehandlung
+// General error handling
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
