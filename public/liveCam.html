@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream</title>
+</head>
+<body>
+<video id="video" autoplay></video>
+<script>
+    const video = document.getElementById('video');
+    const socket = new WebSocket(`ws://${window.location.host}/stream`);
+    const mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
+
+    mediaSource.addEventListener('sourceopen', () => {
+        const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+
+        socket.addEventListener('message', (event) => {
+            sourceBuffer.appendBuffer(new Uint8Array(event.data));
+        });
+
+        sourceBuffer.addEventListener('updateend', () => {
+            mediaSource.endOfStream();
+        });
+    });
+
+    socket.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+
+    socket.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+    });
+</script>
+</body>
+</html>
