@@ -42,7 +42,7 @@ const path = require('path');
 const statusRouter = require('./routes/status');
 const webcamRouter = require('./routes/webcam');
 const WebSocket = require('ws');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
 const app = express();
 
@@ -80,17 +80,17 @@ wss.on('connection', ws => {
     console.log('Client connected');
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const gstCommand = `gst-launch-1.0 rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multipartmux boundary=spion ! tcpclientsink host=127.0.0.1 port=3001`;
+    const gstCommand = `gst-launch-1.0 rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multifilesink location=/dev/stdout`;
 
-    const gstProcess = exec(gstCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`GStreamer error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`GStreamer stderr: ${stderr}`);
-        }
-        console.log(`GStreamer stdout: ${stdout}`);
+    const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'ignore'] });
+
+    gstProcess.stdout.on('data', (data) => {
+        ws.send(data);
+    });
+
+    gstProcess.on('close', (code) => {
+        console.log(`GStreamer process exited with code ${code}`);
+        ws.close();
     });
 
     ws.on('close', () => {
