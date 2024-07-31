@@ -38,66 +38,27 @@
 
 const express = require('express');
 const path = require('path');
-const statusRouter = require('./routes/status');
-const webcamRouter = require('./routes/webcam');
-const WebSocket = require('ws');
-const { spawn } = require('child_process');
+const Stream = require('node-rtsp-stream');
 
 const app = express();
+const PORT = 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/status', statusRouter);
-app.use('/webcam', webcamRouter);
-
-app.use((req, res, next) => {
-    const error = new Error('Not Found');
-    error.status = 404;
-    next(error);
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.use((error, req, res, next) => {
-    res.status(error.status || 500);
-    res.json({
-        error: {
-            message: error.message
-        }
-    });
-});
-
-const PORT = 3000;
 const server = app.listen(PORT, () => {
     console.log(`Server running on Port ${PORT}`);
 });
 
-// WebSocket Server für den Stream
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', ws => {
-    console.log('Client connected');
-
-    const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const gstCommand = `rtspsrc location=${rtspUrl} ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! jpegenc ! rtpjpegpay ! fdsink fd=1`;
-
-    const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'pipe'] });
-
-    gstProcess.stdout.on('data', (data) => {
-        ws.send(data);
-    });
-
-    gstProcess.stderr.on('data', (data) => {
-        console.error(`GStreamer stderr: ${data}`);
-    });
-
-    gstProcess.on('close', (code) => {
-        console.log(`GStreamer process exited with code ${code}`);
-        ws.close();
-    });
-
-    ws.on('close', () => {
-        console.log('Client disconnected');
-        gstProcess.kill('SIGKILL');
-    });
+const stream = new Stream({
+    name: 'camera',
+    streamUrl: 'rtsp://192.168.178.70:8554/stream1',
+    wsPort: 9999,
+    ffmpegOptions: {
+        '-stats': '',
+        '-r': 30
+    }
 });

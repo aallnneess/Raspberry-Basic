@@ -1,28 +1,47 @@
-<!doctype html>
+<!--<!doctype html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport"-->
+<!--          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">-->
+<!--    <meta http-equiv="X-UA-Compatible" content="ie=edge">-->
+<!--    <title>Raspberry Basics</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Welcome to Raspberry Basics</h1>-->
+
+<!--    <br>-->
+
+<!--    <a href="/status.html">-->
+<!--        <button>Status</button>-->
+<!--    </a>-->
+
+<!--    <a href="/webcam-image.html">-->
+<!--        <button>Webcam Foto</button>-->
+<!--    </a>-->
+
+<!--    <a href="/livecamsite.html">-->
+<!--        <button>livecam</button>-->
+<!--    </a>-->
+
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Raspberry Basics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Stream</title>
 </head>
 <body>
-    <h1>Welcome to Raspberry Basics</h1>
-
-    <br>
-
-    <a href="/status.html">
-        <button>Status</button>
-    </a>
-
-    <a href="/webcam-image.html">
-        <button>Webcam Foto</button>
-    </a>
-
-    <a href="/livecamsite.html">
-        <button>livecam</button>
-    </a>
-
+<h1>Webcam Stream</h1>
+<canvas id="canvas"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/jsmpeg@1.0.0/jsmpg.min.js"></script>
+<script>
+    const player = new JSMpeg.Player('ws://localhost:9999', {
+        canvas: document.getElementById('canvas')
+    });
+</script>
 </body>
 </html>
