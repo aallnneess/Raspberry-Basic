@@ -10,12 +10,25 @@
 <video id="video" width="640" height="480" controls autoplay></video>
 <script>
     const video = document.getElementById('video');
-    const ws = new WebSocket('ws://' + window.location.host);
+    const mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
 
-    ws.onmessage = function(event) {
-        const blob = new Blob([event.data], { type: 'video/mp4' });
-        video.src = URL.createObjectURL(blob);
-    };
+    mediaSource.addEventListener('sourceopen', () => {
+        const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
+        const ws = new WebSocket('ws://' + window.location.host);
+        ws.binaryType = 'arraybuffer';
+
+        ws.onmessage = (event) => {
+            if (sourceBuffer.updating || mediaSource.readyState !== 'open') {
+                return;
+            }
+            sourceBuffer.appendBuffer(new Uint8Array(event.data));
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+    });
 </script>
 </body>
 </html>
