@@ -54,6 +54,7 @@ const express = require('express');
 const path = require('path');
 const statusRouter = require('./routes/status');
 const webcamRouter = require('./routes/webcam');
+const liveCamRouter = require('./routes/livecam');
 const http = require('http');
 const WebSocket = require('ws');
 const { spawn } = require('child_process');
@@ -66,6 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/status', statusRouter);
 app.use('/webcam', webcamRouter);
+app.use('/liveCam', liveCamRouter);
 
 // Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
 app.use((req, res, next) => {
@@ -92,7 +94,7 @@ wss.on('connection', (ws) => {
     console.log('Client connected');
     const ffmpeg = spawn('ffmpeg', [
         '-f', 'v4l2',
-        '-input_format', 'mjpeg',
+        '-input_format', 'yuyv422',
         '-i', '/dev/video0',
         '-c:v', 'libx264',
         '-f', 'mpegts',
@@ -129,10 +131,6 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
 
 
 
