@@ -55,7 +55,6 @@ const express = require('express');
 const path = require('path');
 const statusRouter = require('./routes/status');
 const webcamRouter = require('./routes/webcam');
-const liveCamRouter = require('./routes/livecam');
 const http = require('http');
 const WebSocket = require('ws');
 const { spawn } = require('child_process');
@@ -68,7 +67,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/status', statusRouter);
 app.use('/webcam', webcamRouter);
-app.use('/liveCam', liveCamRouter);
 
 // Error handling for not found routes
 app.use((req, res, next) => {
