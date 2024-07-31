@@ -81,9 +81,16 @@ wss.on('connection', ws => {
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
     const ffmpegCommand = ffmpeg(rtspUrl)
+        .inputOptions(['-rtsp_transport tcp'])
         .outputFormat('mp4')
         .videoCodec('libx264')
         .audioCodec('aac')
+        .outputOptions([
+            '-preset ultrafast',
+            '-tune zerolatency',
+            '-f mp4',
+            '-movflags frag_keyframe+empty_moov'
+        ])
         .on('start', (commandLine) => {
             console.log('Spawned Ffmpeg with command: ' + commandLine);
         })
@@ -107,5 +114,4 @@ wss.on('connection', ws => {
         ffmpegCommand.kill('SIGKILL');
     });
 });
-
 
