@@ -31,8 +31,10 @@ router.get('/', (req, res) => {
                     sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
                     sourceBuffer.mode = 'sequence';
 
-                    sourceBuffer.addEventListener('error', (e) => {
-                        console.error('SourceBuffer error:', e);
+                    sourceBuffer.addEventListener('updateend', function() {
+                        if (mediaSource.readyState === 'open' && socket.readyState === WebSocket.CLOSED) {
+                            mediaSource.endOfStream();
+                        }
                     });
 
                     socket.onmessage = function(event) {
@@ -44,12 +46,6 @@ router.get('/', (req, res) => {
                             }
                         }
                     };
-
-                    sourceBuffer.addEventListener('updateend', function() {
-                        if (mediaSource.readyState === 'ended') {
-                            mediaSource.endOfStream();
-                        }
-                    });
                 });
 
                 mediaSource.addEventListener('sourceended', function() {
@@ -62,6 +58,9 @@ router.get('/', (req, res) => {
 
                 socket.onclose = function(event) {
                     console.log('WebSocket closed:', event);
+                    if (mediaSource.readyState === 'open' && sourceBuffer && !sourceBuffer.updating) {
+                        mediaSource.endOfStream();
+                    }
                 };
             </script>
         </body>
