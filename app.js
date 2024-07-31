@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path'); // Modul zum Arbeiten mit Dateipfaden
 const statusRouter = require('./routes/status'); // Importieren des Routings für die Indexseite
 const webcamRouter = require('./routes/webcam');
+const liveCamRouter = require('./routes/livecam');
 
 // Initialisieren der Express-App
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // Bereitstellen statis
 
 app.use('/status', statusRouter); // Verwenden des indexRouters für Anfragen an die Haupt-URL
 app.use('/webcam', webcamRouter);
+app.use('/liveCam', liveCamRouter);
 
 // Fehlerbearbeitung: Wenn Routen nicht gefunden wurden....
 app.use((req, res, next) => {
