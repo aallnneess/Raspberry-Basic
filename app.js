@@ -80,12 +80,16 @@ wss.on('connection', ws => {
     console.log('Client connected');
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const gstCommand = `gst-launch-1.0 rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multifilesink location=/dev/stdout`;
+    const gstCommand = `rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multifilesink location=/dev/stdout`;
 
-    const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'ignore'] });
+    const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'pipe'] });
 
     gstProcess.stdout.on('data', (data) => {
         ws.send(data);
+    });
+
+    gstProcess.stderr.on('data', (data) => {
+        console.error(`GStreamer stderr: ${data}`);
     });
 
     gstProcess.on('close', (code) => {
