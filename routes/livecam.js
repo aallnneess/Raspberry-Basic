@@ -1,39 +1,57 @@
 const express = require('express');
-const router = express.Router();
 const { spawn } = require('child_process');
 
-router.get('/', (req, res) => {
-    res.send('<html><body><video src="/liveCam/stream" controls autoplay></video></body></html>');
+const app = express();
+const PORT = 3000;
+
+// Route für die Live-Stream-Seite
+app.get('/live', (req, res) => {
+    res.send(`
+        <html>
+        <body>
+            <h1>Live Stream</h1>
+            <video id="video" width="640" height="480" controls autoplay></video>
+            <script>
+                var video = document.getElementById('video');
+                var socket = new WebSocket('ws://' + window.location.hostname + ':3000/stream');
+                socket.binaryType = 'arraybuffer';
+                socket.onmessage = function(event) {
+                    var blob = new Blob([event.data], { type: 'video/mp4' });
+                    video.src = URL.createObjectURL(blob);
+                };
+            </script>
+        </body>
+        </html>
+    `);
 });
 
-router.get('/stream', (req, res) => {
-    res.writeHead(200, {
-        'Content-Type': 'video/mp4',
-        'Content-Disposition': 'inline',
-        'Transfer-Encoding': 'chunked'
+// Route für den WebSocket-Stream
+const server = require('http').createServer(app);
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ server, path: '/stream' });
+
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+    const rpicam = spawn('rpicam-vid', ['-t', '0', '--inline', '-o', '-']);
+
+    rpicam.stdout.on('data', (data) => {
+        ws.send(data);
     });
 
-    console.log('Starting ffmpeg...');
-    const ffmpeg = spawn('ffmpeg', ['-f', 'v4l2', '-i', '/dev/video0', '-c:v', 'libx264', '-f', 'mp4', '-movflags', 'frag_keyframe+empty_moov', '-']);
-
-    ffmpeg.stdout.on('data', (data) => {
-        console.log('Streaming data...');
-        res.write(data);
-    });
-
-    ffmpeg.stderr.on('data', (data) => {
+    rpicam.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
     });
 
-    ffmpeg.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        res.end();
+    rpicam.on('close', (code) => {
+        console.log(`rpicam-vid process exited with code ${code}`);
     });
 
-    req.on('close', () => {
-        console.log('Request closed, killing ffmpeg...');
-        ffmpeg.kill();
+    ws.on('close', () => {
+        rpicam.kill();
+        console.log('Client disconnected');
     });
 });
 
-module.exports = router;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
