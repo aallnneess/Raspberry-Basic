@@ -56,10 +56,10 @@
     const ws = new WebSocket('ws://' + window.location.hostname + ':9999');
     ws.binaryType = 'arraybuffer';
 
-    ws.onopen = () => log('WebSocket connection opened');
-    ws.onmessage = (event) => log(`WebSocket message received: ${event.data.byteLength} bytes`);
-    ws.onclose = () => log('WebSocket connection closed');
-    ws.onerror = (error) => log(`WebSocket error: ${error.message}`);
+    // ws.onopen = () => log('WebSocket connection opened');
+    // ws.onmessage = (event) => log(`WebSocket message received: ${event.data.byteLength} bytes`);
+    // ws.onclose = () => log('WebSocket connection closed');
+    // ws.onerror = (error) => log(`WebSocket error: ${error.message}`);
 </script>
 </body>
 </html>
