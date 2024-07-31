@@ -79,7 +79,7 @@ const wss = new WebSocket.Server({ server, path: '/stream' });
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
-    const rpicam = spawn('rpicam-vid', ['-t', '0', '--inline', '-o', '-']);
+    const rpicam = spawn('raspivid', ['-t', '0', '-o', '-', '-w', '640', '-h', '480', '-fps', '25', '-pf', 'baseline', '-hf', '-vf']);
 
     rpicam.stdout.on('data', (data) => {
         if (ws.readyState === WebSocket.OPEN) {
@@ -92,7 +92,7 @@ wss.on('connection', (ws) => {
     });
 
     rpicam.on('close', (code) => {
-        console.log(`rpicam-vid process exited with code ${code}`);
+        console.log(`raspivid process exited with code ${code}`);
     });
 
     ws.on('close', () => {
