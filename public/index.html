@@ -37,11 +37,29 @@
 <body>
 <h1>Webcam Stream</h1>
 <canvas id="canvas"></canvas>
+<div id="log"></div>
 <script src="https://cdn.jsdelivr.net/npm/jsmpeg@1.0.0/jsmpg.min.js"></script>
 <script>
-    const player = new JSMpeg.Player('ws://localhost:9999', {
-        canvas: document.getElementById('canvas')
+    const log = (msg) => {
+        const logElement = document.getElementById('log');
+        logElement.innerHTML += msg + '<br>';
+    };
+
+    const player = new JSMpeg.Player('ws://' + window.location.host.split(':')[0] + ':9999', {
+        canvas: document.getElementById('canvas'),
+        onPlay: () => log('Playing'),
+        onPause: () => log('Paused'),
+        onEnded: () => log('Ended'),
+        onStalled: () => log('Stalled')
     });
+
+    const ws = new WebSocket('ws://' + window.location.host.split(':')[0] + ':9999');
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => log('WebSocket connection opened');
+    ws.onmessage = (event) => log(`WebSocket message received: ${event.data.byteLength} bytes`);
+    ws.onclose = () => log('WebSocket connection closed');
+    ws.onerror = (error) => log(`WebSocket error: ${error.message}`);
 </script>
 </body>
 </html>
