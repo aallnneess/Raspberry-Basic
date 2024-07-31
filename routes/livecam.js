@@ -1,11 +1,12 @@
 const express = require('express');
 const { spawn } = require('child_process');
+const router = express.Router();
 
 const app = express();
 const PORT = 3000;
 
 // Route für die Live-Stream-Seite
-app.get('/live', (req, res) => {
+router.get('/live', (req, res) => {
     res.send(`
         <html>
         <body>
@@ -55,3 +56,5 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = router;
