@@ -98,7 +98,9 @@ wss.on('connection', (ws) => {
     const rpicam = spawn('rpicam-vid', ['-t', '0', '--inline', '-o', '-']);
 
     rpicam.stdout.on('data', (data) => {
-        ws.send(data);
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(data);
+        }
     });
 
     rpicam.stderr.on('data', (data) => {
@@ -112,6 +114,11 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         rpicam.kill();
         console.log('Client disconnected');
+    });
+
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+        rpicam.kill();
     });
 });
 

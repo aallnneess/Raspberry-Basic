@@ -26,12 +26,43 @@ router.get('/', (req, res) => {
                 let mediaSource = new MediaSource();
                 video.src = URL.createObjectURL(mediaSource);
 
+                let sourceBuffer;
                 mediaSource.addEventListener('sourceopen', function() {
-                    let sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+                    sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+                    sourceBuffer.mode = 'sequence';
+
+                    sourceBuffer.addEventListener('error', (e) => {
+                        console.error('SourceBuffer error:', e);
+                    });
+
                     socket.onmessage = function(event) {
-                        sourceBuffer.appendBuffer(new Uint8Array(event.data));
+                        if (sourceBuffer && !sourceBuffer.updating) {
+                            try {
+                                sourceBuffer.appendBuffer(new Uint8Array(event.data));
+                            } catch (e) {
+                                console.error('Error appending buffer:', e);
+                            }
+                        }
                     };
+
+                    sourceBuffer.addEventListener('updateend', function() {
+                        if (mediaSource.readyState === 'ended') {
+                            mediaSource.endOfStream();
+                        }
+                    });
                 });
+
+                mediaSource.addEventListener('sourceended', function() {
+                    console.log('MediaSource ended');
+                });
+
+                socket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                };
+
+                socket.onclose = function(event) {
+                    console.log('WebSocket closed:', event);
+                };
             </script>
         </body>
         </html>
@@ -39,4 +70,3 @@ router.get('/', (req, res) => {
 });
 
 module.exports = router;
-
