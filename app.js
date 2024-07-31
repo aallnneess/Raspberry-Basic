@@ -80,7 +80,7 @@ wss.on('connection', ws => {
     console.log('Client connected');
 
     const rtspUrl = 'rtsp://192.168.178.70:8554/stream1';
-    const gstCommand = `rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! multifilesink location=/dev/stdout`;
+    const gstCommand = `rtspsrc location=${rtspUrl} ! decodebin ! videoconvert ! video/x-raw,format=I420 ! jpegenc ! fdsink fd=1`;
 
     const gstProcess = spawn('gst-launch-1.0', gstCommand.split(' '), { stdio: ['ignore', 'pipe', 'pipe'] });
 
